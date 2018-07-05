@@ -22,12 +22,15 @@ PostFX fx;
 
 int SONG_SKIP_MILLISECONDS = 5000;
 int BASE_RADIUS = 300;
+int MAX_POS_DELTA = 5;
+float MAX_COLOR_DELTA = 1.0;
 
+float angle = 0;
 int radius = BASE_RADIUS;
 int bloomSize = radius / 20;
-int x = 400;
-int dx = 5;
-int ellipseCount = 1;
+ArrayList<PShape> shapes = new ArrayList<PShape>();
+ArrayList<PVector> shapesDelta = new ArrayList<PVector>();
+ArrayList<Integer> shapesColor = new ArrayList<Integer>();
 boolean ellipsePosInc = true;
 
 void setup() {
@@ -98,27 +101,57 @@ void draw() {
   
   noStroke();
   fill(255,255,255);
-  sphere(radius);
+  PShape sphere = createShape(SPHERE, radius);
+  // Center Sphere when not using PeasyCam
+  // sphere.translate(width/2,height/2,-100);
+  shape(sphere);
+  
+  // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
-    //bloomSize *= 4;
     Ani.to(this, .5, "radius", BASE_RADIUS * 1.05);
     Ani.to(this, .5, "bloomSize", radius / 3);
-    if (random(0, 1) > 0.5){
-      ellipseCount = 1;
+    if (true){
+      // Create new Shape
+      PShape shape = createShape(SPHERE, radius / 10);
+      // Set Shapes Color
+      int shapeColor = color(random(150, 255), random(150, 255), random(150, 255));
+      // Define moving speed
+      PVector shapeDelta = new PVector(random(-MAX_POS_DELTA, MAX_POS_DELTA), random(-MAX_POS_DELTA, MAX_POS_DELTA), random(-MAX_POS_DELTA, MAX_POS_DELTA));
+      
+      // Center when not using PeasyCam
+      // shape.translate(width/2,height/2,0);
+      shape.setFill(shapeColor);
+      
+      // Add dynamic values to Lists
+      shapes.add(shape);
+      shapesDelta.add(shapeDelta);
+      shapesColor.add(shapeColor);
     }
   }else{
     Ani.to(this, .5, "radius", BASE_RADIUS);
     Ani.to(this, .5, "bloomSize", radius / 20);
   }
-  for (int i = 0; i < ellipseCount; ++i){
-    if(x <= -width || x >= width) dx = dx * -1;
-    x = x + dx;
+  // Do something with all (child)shapes
+  for (int i = 0; i < shapes.size(); ++i){
+    //if(x <= -width || x >= width) dx = dx * -1;
+    PShape shape = shapes.get(i);
+    shape.translate(shapesDelta.get(i).x, shapesDelta.get(i).y, shapesDelta.get(i).z);
     
-    ellipse(x, 0, radius/10, radius/10);
+    int shapeColor = shapesColor.get(i);
+    float red = red(shapeColor) + random(-MAX_COLOR_DELTA);
+    float green = green(shapeColor) + random(-MAX_COLOR_DELTA);
+    float blue = blue(shapeColor) + random(-MAX_COLOR_DELTA);
+    shapeColor = color(red, green, blue);
+    shapesColor.set(i, shapeColor);
+    shape.setFill(color(red, green, blue));
+    shape(shape);
   }
   
   fx.render().bloom(.5, bloomSize, 30).compose();
-  
+  //cam.rotateX(radians(angle));
+  cam.rotateZ(radians(angle));
+  angle = (angle + 0.01) % 360;
+  println(angle);
 }
 
 void keyPressed() {
@@ -131,7 +164,7 @@ void keyPressed() {
       song.skip(SONG_SKIP_MILLISECONDS);
     }
   }
-  // Space bar: play/payse
+  // Space bar: play/pause
   else if (key == ' ') {
     if (song.isPlaying())
       song.pause();
