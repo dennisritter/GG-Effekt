@@ -1,18 +1,31 @@
 import peasy.*;
+
 import ddf.minim.*;
 import ddf.minim.analysis.*;
- 
+
+import ch.bildspur.postfx.builder.*;
+import ch.bildspur.postfx.pass.*;
+import ch.bildspur.postfx.*;
+
 PVector light = new PVector();  // Light direction for shading
 PeasyCam cam;   // Useful camera library
+
 Minim minim;
 AudioPlayer song;
 AudioInput input;
 BeatDetect beatFRQ;
 BeatDetect beatAMP;
 
+PostFX fx;
+
+int SONG_SKIP_MILLISECONDS = 5000;
+
 void setup() {
     //fullScreen(P3D);
     size(1024, 720, P3D);
+    
+    // init PostFX
+    fx = new PostFX(this);
     
     // Setup camera
     cam = new PeasyCam(this, 1000);
@@ -24,9 +37,7 @@ void setup() {
     beatFRQ = new BeatDetect(song.bufferSize(), song.sampleRate());
     beatAMP = new BeatDetect(song.bufferSize(), song.sampleRate());
     input = minim.getLineIn();
-    
-    
-    // Play the loaded song
+      
     song.play();
 }
 
@@ -48,15 +59,14 @@ void drawWaveform() {
 void draw() {
   background(0);
   // Calculate the light position
-  final float t = TWO_PI * (millis() / 1000.0) / 10.0;
-  light.set(sin(t) * 160, -160, cos(t) * 160);
+  //final float t = TWO_PI * (millis() / 1000.0) / 10.0;
+  //light.set(sin(t) * 160, -160, cos(t) * 160);
   
-  drawWaveform();
+  //drawWaveform();
   
   // Beat Detection Setup
   beatFRQ.detect(song.mix);
   beatFRQ.detectMode(BeatDetect.FREQ_ENERGY);
-  translate(0, -200, 0);
   PVector colorRGB = new PVector(0, 0, 0);
   if(beatFRQ.isKick()) {
     colorRGB.x = 255;
@@ -72,11 +82,41 @@ void draw() {
   
   beatAMP.detectMode(BeatDetect.SOUND_ENERGY);
   beatAMP.detect(song.mix);
-  int radius = beatAMP.isOnset() ? 100 : 50;
-  //int radius = beat.isRange(0,1024,1) ? 100 : 50;
   
-  lights();
+  int radius = 300;
+  
+  
   noStroke();
-  fill(c);
+  fill(255,255,255);
   sphere(radius);
+  int bloomSize = 10;
+  if (beatAMP.isOnset()) {
+    bloomSize = 30;  
+  }
+  fx.render().bloom(.5, bloomSize, 30).compose();
+  
+}
+
+void keyPressed() {
+  if (key == CODED) {
+    // Left/right arrow keys: seek song
+    if (keyCode == LEFT) {
+      song.skip(-SONG_SKIP_MILLISECONDS);
+    } 
+    else if (keyCode == RIGHT) {
+      song.skip(SONG_SKIP_MILLISECONDS);
+    }
+  }
+  // Space bar: play/payse
+  else if (key == ' ') {
+    if (song.isPlaying())
+      song.pause();
+    else
+      song.play();
+  }
+  // Enter: spit out the current position
+  // (for syncing)
+  else if (key == ENTER) {
+    print(song.position() + ", ");
+  }
 }
