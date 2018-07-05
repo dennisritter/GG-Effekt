@@ -25,7 +25,7 @@ int BASE_RADIUS = 300;
 int MAX_POS_DELTA = 5;
 float MAX_COLOR_DELTA = 1.0;
 
-float angle = 0;
+PVector camRotationAngle = new PVector(0.5, 1.0, 2.0);
 int radius = BASE_RADIUS;
 int bloomSize = radius / 20;
 ArrayList<PShape> shapes = new ArrayList<PShape>();
@@ -148,10 +148,7 @@ void draw() {
   }
   
   fx.render().bloom(.5, bloomSize, 30).compose();
-  //cam.rotateX(radians(angle));
-  cam.rotateZ(radians(angle));
-  angle = (angle + 0.01) % 360;
-  println(angle);
+  cam.rotateX(radians(cos(millis())));
 }
 
 void keyPressed() {
