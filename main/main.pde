@@ -25,6 +25,10 @@ int BASE_RADIUS = 300;
 
 int radius = BASE_RADIUS;
 int bloomSize = radius / 20;
+int x = 400;
+int dx = 5;
+int ellipseCount = 1;
+boolean ellipsePosInc = true;
 
 void setup() {
     //fullScreen(P3D);
@@ -99,10 +103,20 @@ void draw() {
     //bloomSize *= 4;
     Ani.to(this, .5, "radius", BASE_RADIUS * 1.05);
     Ani.to(this, .5, "bloomSize", radius / 3);
+    if (random(0, 1) > 0.5){
+      ellipseCount = 1;
+    }
   }else{
     Ani.to(this, .5, "radius", BASE_RADIUS);
     Ani.to(this, .5, "bloomSize", radius / 20);
   }
+  for (int i = 0; i < ellipseCount; ++i){
+    if(x <= -width || x >= width) dx = dx * -1;
+    x = x + dx;
+    
+    ellipse(x, 0, radius/10, radius/10);
+  }
+  
   fx.render().bloom(.5, bloomSize, 30).compose();
   
 }
