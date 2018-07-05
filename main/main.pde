@@ -7,6 +7,8 @@ import ch.bildspur.postfx.builder.*;
 import ch.bildspur.postfx.pass.*;
 import ch.bildspur.postfx.*;
 
+import de.looksgood.ani.*;
+
 PVector light = new PVector();  // Light direction for shading
 PeasyCam cam;   // Useful camera library
 
@@ -19,6 +21,10 @@ BeatDetect beatAMP;
 PostFX fx;
 
 int SONG_SKIP_MILLISECONDS = 5000;
+int BASE_RADIUS = 300;
+
+int radius = BASE_RADIUS;
+int bloomSize = radius / 20;
 
 void setup() {
     //fullScreen(P3D);
@@ -26,6 +32,8 @@ void setup() {
     
     // init PostFX
     fx = new PostFX(this);
+    
+    Ani.init(this);
     
     // Setup camera
     cam = new PeasyCam(this, 1000);
@@ -43,6 +51,7 @@ void setup() {
 
 void drawWaveform() {
   stroke(255);
+  smooth();
   // we draw the waveform by connecting neighbor values with a line
   // we multiply each of the values by 50 
   // because the values in the buffers are normalized
@@ -83,15 +92,16 @@ void draw() {
   beatAMP.detectMode(BeatDetect.SOUND_ENERGY);
   beatAMP.detect(song.mix);
   
-  int radius = 300;
-  
-  
   noStroke();
   fill(255,255,255);
   sphere(radius);
-  int bloomSize = 10;
   if (beatAMP.isOnset()) {
-    bloomSize = 30;  
+    //bloomSize *= 4;
+    Ani.to(this, .5, "radius", BASE_RADIUS * 1.05);
+    Ani.to(this, .5, "bloomSize", radius / 3);
+  }else{
+    Ani.to(this, .5, "radius", BASE_RADIUS);
+    Ani.to(this, .5, "bloomSize", radius / 20);
   }
   fx.render().bloom(.5, bloomSize, 30).compose();
   
