@@ -4,8 +4,11 @@ public class Particle {
   PVector shapeDelta = new PVector(random(-MAX_POS_DELTA, MAX_POS_DELTA), random(-MAX_POS_DELTA, MAX_POS_DELTA), random(-MAX_POS_DELTA, MAX_POS_DELTA));
   
   private int radius;
-  private int color;
+  private int col;
   private PVector direction;
+  private float velocity;
+  
+  private PShape shape;
   
   public Particle() {
     this(BASE_RADIUS);
@@ -15,16 +18,35 @@ public class Particle {
     this(radius, color(random(0, 255), random(0, 255), random(0, 255)));
   }
   
-  public Particle(int radius, int color) {
-    this(radius, color, PVector.random3D());
+  public Particle(int radius, int col) {
+    this(radius, col, PVector.random3D());
   }
   
-  public Particle(int radius, int color, PVector direction) {
+  public Particle(int radius, int col, PVector direction) {
+    this(radius, col, direction, 0.0f);
+  }
+  
+  private Particle(int radius, int col, PVector direction, float velocity) {
     this.radius = radius;
-    this.color = color;
+    this.col = col;
     this.direction = direction;
+    this.velocity = velocity;
+    this.constructParticle();
   }
   
+  public void constructParticle(){
+    PShape particleShape = createShape(SPHERE, this.radius);
+    particleShape.setFill(this.col);
+    particleShape.setStroke(false);
+    this.shape = particleShape;
+  }
   
+  public void drawParticle(){
+    shape(this.shape);
+  }
+  
+  public void moveParticle(){
+  
+  }
   
 }

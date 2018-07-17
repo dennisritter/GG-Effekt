@@ -33,7 +33,11 @@ ArrayList<PVector> shapesDelta = new ArrayList<PVector>();
 ArrayList<Integer> shapesColor = new ArrayList<Integer>();
 boolean ellipsePosInc = true;
 
+Particle particle;
+
 void setup() {
+    particle = new Particle(200);
+  
     //fullScreen(P3D);
     size(1024, 720, P3D);
     
@@ -101,10 +105,11 @@ void draw() {
   
   noStroke();
   fill(255,255,255);
-  PShape sphere = createShape(SPHERE, radius);
+  // PShape sphere = createShape(SPHERE, radius);
+  particle.drawParticle();
   // Center Sphere when not using PeasyCam
   // sphere.translate(width/2,height/2,-100);
-  shape(sphere);
+  // shape(sphere);
   
   // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
@@ -148,7 +153,6 @@ void draw() {
   }
   
   fx.render().bloom(.5, bloomSize, 30).compose();
-  cam.rotateX(radians(cos(millis())));
 }
 
 void keyPressed() {
