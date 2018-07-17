@@ -106,13 +106,15 @@ void draw() {
   noStroke();
   fill(255,255,255);
   // PShape sphere = createShape(SPHERE, radius);
-  particle.drawParticle();
+  if (beatAMP.isOnset()) particle.applyForce(new PVector(100.0f, 0, 0));
+  particle.update();
   // Center Sphere when not using PeasyCam
   // sphere.translate(width/2,height/2,-100);
   // shape(sphere);
   
   // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
+    
     Ani.to(this, .5, "radius", BASE_RADIUS * 1.05);
     Ani.to(this, .5, "bloomSize", radius / 3);
     if (true){

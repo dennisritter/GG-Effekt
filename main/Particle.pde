@@ -6,8 +6,9 @@ public class Particle {
   private int radius;
   private int col;
   private PVector direction;
-  private float velocity;
+  private PVector velocity;
   
+  private PVector acceleration;
   private PShape shape;
   
   public Particle() {
@@ -23,14 +24,15 @@ public class Particle {
   }
   
   public Particle(int radius, int col, PVector direction) {
-    this(radius, col, direction, 0.0f);
+    this(radius, col, direction, new PVector(0, 0, 0));
   }
   
-  private Particle(int radius, int col, PVector direction, float velocity) {
+  private Particle(int radius, int col, PVector direction, PVector velocity) {
     this.radius = radius;
     this.col = col;
     this.direction = direction;
     this.velocity = velocity;
+    this.acceleration = new PVector(0, 0, 0);
     this.constructParticle();
   }
   
@@ -46,7 +48,25 @@ public class Particle {
   }
   
   public void moveParticle(){
+    //PVector transVector = this.direction.mult(this.velocity);
+    this.shape.translate(this.velocity.x, this.velocity.y, this.velocity.z);
+  }
   
+  public void applyForce(PVector force){
+    PVector f = PVector.div(force, this.radius);
+    this.acceleration.add(f);
+  }
+  
+  public void setVelocity(PVector velocity){
+    this.velocity = velocity;
+  }
+  
+  public void update(){
+    this.velocity.add(this.acceleration);
+    this.moveParticle();
+    this.drawParticle();
+    this.acceleration.mult(0);
+    this.velocity.mult(0.95f);
   }
   
 }
