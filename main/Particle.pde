@@ -1,20 +1,20 @@
 public class Particle {
   
-  private int BASE_RADIUS = 20;
+  private static final int BASE_RADIUS = 20;
   
   private int radius;
   private int color;
   
   public Particle() {
-    this.radius = BASE_RADIUS;
-    this.color = 
+    this(BASE_RADIUS);
   }
   
   public Particle(int radius) {
-  
+    this(radius, color(random(0, 255), random(0, 255), random(0, 255)));
   }
   
   public Particle(int radius, int color) {
-  
+    this.radius = radius;
+    this.color = color;
   }
 }
