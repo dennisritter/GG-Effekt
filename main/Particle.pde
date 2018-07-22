@@ -66,7 +66,7 @@ public class Particle {
     this.move(this.velocity);
     this.drawParticle();
     this.acceleration.mult(0);
-    this.velocity.mult(0.95f);
+    this.velocity.mult(0.98f);
   }
   
   public int getColor() { return this.col; }
@@ -74,5 +74,7 @@ public class Particle {
   public PVector getDirection() { return this.direction; }
   public void setDirection(PVector direction) { this.direction = direction; }
   public float getDistanceFromSpawn() { return this.distanceFromSpawn; }
+  public int getRadius() { return this.radius; }
+  public void setRadius(int r) { this.radius = r; }
   public void setVelocity(PVector velocity){ this.velocity = velocity; }
 }
