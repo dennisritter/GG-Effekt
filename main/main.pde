@@ -125,7 +125,7 @@ void draw() {
   
   if (beatSENS.isOnset()) {
     forceStr += 0.25f;
-    if(forceStr > 5.0f) forceStr = 5.0f;
+    if(forceStr > 3.0f) forceStr = 3.0f;
   } else {
     forceStr -= 0.05f;
     if (forceStr < 0.0f) forceStr = 0.0f;
