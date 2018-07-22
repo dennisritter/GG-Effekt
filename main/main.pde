@@ -125,10 +125,12 @@ void draw() {
   
   if (beatSENS.isOnset()) {
     forceStr += 0.25f;
+    if(forceStr > 5.0f) forceStr = 5.0f;
   } else {
     forceStr -= 0.05f;
     if (forceStr < 0.0f) forceStr = 0.0f;
   }
+  System.out.println(forceStr);
   
   // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
@@ -141,12 +143,20 @@ void draw() {
   }
   
   // Animate all particles
+  ArrayList<Integer> deadParticleIndices = new ArrayList<Integer>();
   for (int i = 0; i < particles.size(); ++i){
     Particle particle = particles.get(i);
     
+    // Check if particle Black already
+    color particleColor = particle.getColor();
+    boolean isBlack = red(particleColor) + green(particleColor) + blue(particleColor) == 0.0; 
+    if (isBlack) {
+      deadParticleIndices.add(i);
+    }
+    
     
     if (beatSENS.isOnset()) {
-      particle.setColor(colorFactory.darken(particle.getColor(), 5));
+      particle.setColor(colorFactory.darken(particle.getColor(), 1));
     }
     else {}
     
@@ -162,8 +172,11 @@ void draw() {
     }
     
     particle.update();
-  }  
+  }
   
+  for (int i = 0; i < deadParticleIndices.size(); ++i){
+    particles.remove(i);
+  }
   // Apply Bloom Effect
   fx.render().bloom(.5, bloomSize, 30).compose();
 }

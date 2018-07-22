@@ -30,6 +30,9 @@ public class ColorFactory{
     r = red(c) - step;
     g = green(c) - step;
     b = blue(c) - step;
+    if (r < 0.0f) r = 0.0f;
+    if (g < 0.0f) r = 0.0f;
+    if (b < 0.0f) r = 0.0f;
     return color(r, g, b);
   }
   
