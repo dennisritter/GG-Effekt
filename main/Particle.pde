@@ -47,9 +47,9 @@ public class Particle {
     shape(this.shape);
   }
   
-  public void moveParticle(){
+  public void move(PVector velocity){
     //PVector transVector = this.direction.mult(this.velocity);
-    this.shape.translate(this.velocity.x, this.velocity.y, this.velocity.z);
+    this.shape.translate(velocity.x, velocity.y, velocity.z);
   }
   
   public void applyForce(PVector force){
@@ -58,8 +58,9 @@ public class Particle {
   }
   
   public void update(){
+    shape.setFill(this.col);
     this.velocity.add(this.acceleration);
-    this.moveParticle();
+    this.move(this.velocity);
     this.drawParticle();
     this.acceleration.mult(0);
     this.velocity.mult(0.95f);

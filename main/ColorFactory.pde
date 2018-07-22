@@ -24,4 +24,13 @@ public class ColorFactory{
     return color(random(minLightness, 255), random(minLightness, 255), random(minLightness, 255));
   }
   
+  public int darken(int col, int step) {
+    color c = color(col);
+    float r,g,b;
+    r = red(c) - step;
+    g = green(c) - step;
+    b = blue(c) - step;
+    return color(r, g, b);
+  }
+  
 }

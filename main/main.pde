@@ -50,6 +50,7 @@ void setup() {
     song = minim.loadFile("../assets/levitation.mp3", 1024);
     beatFRQ = new BeatDetect(song.bufferSize(), song.sampleRate());
     beatAMP = new BeatDetect(song.bufferSize(), song.sampleRate());
+    beatAMP.setSensitivity(200);
     input = minim.getLineIn();
       
     song.play();
@@ -98,26 +99,29 @@ void draw() {
   
   noStroke();
   fill(255,255,255);
-  // PShape sphere = createShape(SPHERE, radius);
+  PShape sphere = createShape(SPHERE, radius);
   // Center Sphere when not using PeasyCam
   // sphere.translate(width/2,height/2,-100);
-  // shape(sphere);
+  shape(sphere);
   
   // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
-    Ani.to(this, .5, "radius", BASE_RADIUS * 1.05);
-    Ani.to(this, .5, "bloomSize", radius / 3);
+    Ani.to(this, .5, "radius", BASE_RADIUS * 1.10);
+    Ani.to(this, .5, "bloomSize", radius / 2);
   
     // Create new Particle
     int pColor = colorFactory.randomBrightColor(150);
-    particles.add(new Particle(radius / 10, pColor));
+    Particle p = new Particle(radius / 10, pColor);
+    p.move(p.getDirection().mult(BASE_RADIUS));
+    particles.add(p);
     
     // Animate all particles
     for (int i = 0; i < particles.size(); ++i){
       Particle particle = particles.get(i);
       
+      particle.setColor(colorFactory.darken(particle.getColor(), 20));
       PVector pDirection = particle.getDirection();
-      float forceStr = 1.5f;
+      float forceStr = 1.0f;
       particle.applyForce(pDirection.mult(forceStr));
       
     }
