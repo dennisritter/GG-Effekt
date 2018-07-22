@@ -119,7 +119,7 @@ void draw() {
   shape(sphere);
   
 
-  int pColor = colorFactory.randomBrightColor(150);
+  int pColor = colorFactory.randomBrightColor(100);
   int pRadius = (int) random(BASE_RADIUS / 40.0f, BASE_RADIUS / 5.0f);
   Particle p = new Particle(pRadius, pColor);
   p.move(p.getDirection().mult(BASE_RADIUS - pRadius));
@@ -157,7 +157,7 @@ void draw() {
     
     
     if (beatSENS.isOnset()) {
-      //particle.setColor(colorFactory.darken(particle.getColor(), 3));
+    particle.setColor(colorFactory.darken(particle.getColor(), 3));
     }
     else {}
     
