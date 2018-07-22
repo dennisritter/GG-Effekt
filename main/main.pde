@@ -24,19 +24,14 @@ int SONG_SKIP_MILLISECONDS = 5000;
 int BASE_RADIUS = 300;
 int MAX_POS_DELTA = 5;
 float MAX_COLOR_DELTA = 1.0;
+ColorFactory colorFactory = new ColorFactory();
 
 PVector camRotationAngle = new PVector(0.5, 1.0, 2.0);
 int radius = BASE_RADIUS;
 int bloomSize = radius / 20;
-ArrayList<PShape> shapes = new ArrayList<PShape>();
-ArrayList<PVector> shapesDelta = new ArrayList<PVector>();
-ArrayList<Integer> shapesColor = new ArrayList<Integer>();
-boolean ellipsePosInc = true;
-
-Particle particle;
+ArrayList<Particle> particles = new ArrayList<Particle>();
 
 void setup() {
-    particle = new Particle(200);
   
     //fullScreen(P3D);
     size(1024, 720, P3D);
@@ -82,8 +77,6 @@ void draw() {
   //final float t = TWO_PI * (millis() / 1000.0) / 10.0;
   //light.set(sin(t) * 160, -160, cos(t) * 160);
   
-  //drawWaveform();
-  
   // Beat Detection Setup
   beatFRQ.detect(song.mix);
   beatFRQ.detectMode(BeatDetect.FREQ_ENERGY);
@@ -106,54 +99,40 @@ void draw() {
   noStroke();
   fill(255,255,255);
   // PShape sphere = createShape(SPHERE, radius);
-  if (beatAMP.isOnset()) particle.applyForce(new PVector(100.0f, 0, 0));
-  particle.update();
   // Center Sphere when not using PeasyCam
   // sphere.translate(width/2,height/2,-100);
   // shape(sphere);
   
   // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
-    
     Ani.to(this, .5, "radius", BASE_RADIUS * 1.05);
     Ani.to(this, .5, "bloomSize", radius / 3);
-    if (true){
-      // Create new Shape
-      PShape shape = createShape(SPHERE, radius / 10);
-      // Set Shapes Color
-      int shapeColor = color(random(150, 255), random(150, 255), random(150, 255));
-      // Define moving speed
-      PVector shapeDelta = new PVector(random(-MAX_POS_DELTA, MAX_POS_DELTA), random(-MAX_POS_DELTA, MAX_POS_DELTA), random(-MAX_POS_DELTA, MAX_POS_DELTA));
+  
+    // Create new Particle
+    int pColor = colorFactory.randomBrightColor(150);
+    particles.add(new Particle(radius / 10, pColor));
+    
+    // Animate all particles
+    for (int i = 0; i < particles.size(); ++i){
+      Particle particle = particles.get(i);
       
-      // Center when not using PeasyCam
-      // shape.translate(width/2,height/2,0);
-      shape.setFill(shapeColor);
+      PVector pDirection = particle.getDirection();
+      float forceStr = 1.5f;
+      particle.applyForce(pDirection.mult(forceStr));
       
-      // Add dynamic values to Lists
-      shapes.add(shape);
-      shapesDelta.add(shapeDelta);
-      shapesColor.add(shapeColor);
     }
+    
   }else{
     Ani.to(this, .5, "radius", BASE_RADIUS);
     Ani.to(this, .5, "bloomSize", radius / 20);
   }
-  // Do something with all (child)shapes
-  for (int i = 0; i < shapes.size(); ++i){
-    //if(x <= -width || x >= width) dx = dx * -1;
-    PShape shape = shapes.get(i);
-    shape.translate(shapesDelta.get(i).x, shapesDelta.get(i).y, shapesDelta.get(i).z);
-    
-    int shapeColor = shapesColor.get(i);
-    float red = red(shapeColor) + random(-MAX_COLOR_DELTA);
-    float green = green(shapeColor) + random(-MAX_COLOR_DELTA);
-    float blue = blue(shapeColor) + random(-MAX_COLOR_DELTA);
-    shapeColor = color(red, green, blue);
-    shapesColor.set(i, shapeColor);
-    shape.setFill(color(red, green, blue));
-    shape(shape);
+  
+  for (int i = 0; i < particles.size(); ++i){
+    Particle particle = particles.get(i);
+    particle.update();
   }
   
+  // Apply Bloom Effect
   fx.render().bloom(.5, bloomSize, 30).compose();
 }
 

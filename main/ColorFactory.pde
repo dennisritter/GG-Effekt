@@ -20,4 +20,8 @@ public class ColorFactory{
     return color(random(r.x, r.y), random(g.x, g.y), random(b.x, b.y));
   }
 
+  public int randomBrightColor(int minLightness) {
+    return color(random(minLightness, 255), random(minLightness, 255), random(minLightness, 255));
+  }
+  
 }

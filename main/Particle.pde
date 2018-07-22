@@ -33,10 +33,10 @@ public class Particle {
     this.direction = direction;
     this.velocity = velocity;
     this.acceleration = new PVector(0, 0, 0);
-    this.constructParticle();
+    this.createParticleShape();
   }
   
-  public void constructParticle(){
+  public void createParticleShape(){
     PShape particleShape = createShape(SPHERE, this.radius);
     particleShape.setFill(this.col);
     particleShape.setStroke(false);
@@ -57,10 +57,6 @@ public class Particle {
     this.acceleration.add(f);
   }
   
-  public void setVelocity(PVector velocity){
-    this.velocity = velocity;
-  }
-  
   public void update(){
     this.velocity.add(this.acceleration);
     this.moveParticle();
@@ -69,4 +65,9 @@ public class Particle {
     this.velocity.mult(0.95f);
   }
   
+  public int getColor() { return this.col; }
+  public void setColor(int col) { this.col = col; }
+  public PVector getDirection() { return this.direction; }
+  public void setDirection(PVector direction) { this.direction = direction; }
+  public void setVelocity(PVector velocity){ this.velocity = velocity; }
 }
