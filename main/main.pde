@@ -17,6 +17,7 @@ AudioPlayer song;
 AudioInput input;
 BeatDetect beatFRQ;
 BeatDetect beatAMP;
+BeatDetect beatSENS;
 
 PostFX fx;
 
@@ -28,6 +29,11 @@ ColorFactory colorFactory = new ColorFactory();
 
 PVector camRotationAngle = new PVector(0.5, 1.0, 2.0);
 int radius = BASE_RADIUS;
+
+// The main Sphere in Center
+PShape sphere;
+
+float forceStr = 0.0f;
 int bloomSize = radius / 20;
 ArrayList<Particle> particles = new ArrayList<Particle>();
 
@@ -51,6 +57,8 @@ void setup() {
     beatFRQ = new BeatDetect(song.bufferSize(), song.sampleRate());
     beatAMP = new BeatDetect(song.bufferSize(), song.sampleRate());
     beatAMP.setSensitivity(200);
+    beatSENS = new BeatDetect(song.bufferSize(), song.sampleRate());
+    beatSENS.setSensitivity(10);
     input = minim.getLineIn();
       
     song.play();
@@ -79,7 +87,7 @@ void draw() {
   //light.set(sin(t) * 160, -160, cos(t) * 160);
   
   // Beat Detection Setup
-  beatFRQ.detect(song.mix);
+  /*beatFRQ.detect(song.mix);
   beatFRQ.detectMode(BeatDetect.FREQ_ENERGY);
   PVector colorRGB = new PVector(0, 0, 0);
   if(beatFRQ.isKick()) {
@@ -93,40 +101,58 @@ void draw() {
   };
   if(colorRGB.x + colorRGB.y + colorRGB.z == 0) colorRGB.add(255, 255, 255);
   color c = color(colorRGB.x, colorRGB.y, colorRGB.z);
+  */
   
   beatAMP.detectMode(BeatDetect.SOUND_ENERGY);
   beatAMP.detect(song.mix);
+  beatSENS.detectMode(BeatDetect.SOUND_ENERGY);
+  beatSENS.detect(song.mix);
   
   noStroke();
   fill(255,255,255);
-  PShape sphere = createShape(SPHERE, radius);
+  sphere = createShape(SPHERE, radius);
   // Center Sphere when not using PeasyCam
   // sphere.translate(width/2,height/2,-100);
   shape(sphere);
+  if (beatSENS.isOnset()) {
+    // Create new Particle
+    int pColor = colorFactory.randomBrightColor(150);
+    int pRadius = BASE_RADIUS / 10;
+    Particle p = new Particle(pRadius, pColor);
+    p.move(p.getDirection().mult(BASE_RADIUS - pRadius));
+    particles.add(p);
+    forceStr += 0.25f;
+   
+  } else {
+    forceStr -= 0.05f;
+    if (forceStr < 0.0f) forceStr = 0.0f;
+  }
   
   // If Amplitude Peak is detected
   if (beatAMP.isOnset()) {
     Ani.to(this, .5, "radius", BASE_RADIUS * 1.10);
     Ani.to(this, .5, "bloomSize", radius / 2);
-  
-    // Create new Particle
-    int pColor = colorFactory.randomBrightColor(150);
-    Particle p = new Particle(radius / 10, pColor);
-    p.move(p.getDirection().mult(BASE_RADIUS));
-    particles.add(p);
+    
     
     // Animate all particles
     for (int i = 0; i < particles.size(); ++i){
+      
       Particle particle = particles.get(i);
       
-      particle.setColor(colorFactory.darken(particle.getColor(), 20));
+      //particle.setColor(colorFactory.darken(particle.getColor(), 20));
       PVector pDirection = particle.getDirection();
-      float forceStr = 1.0f;
-      particle.applyForce(pDirection.mult(forceStr));
+      float pDistance = particle.getDistanceFromSpawn();
       
-    }
-    
+      PVector force = pDirection.mult(forceStr);
+      
+      // Increase force for objects that are far away
+      force = force.mult((pDistance / 300.0f) * 2.0f);
+     
+      particle.applyForce(force);
+
+    }  
   }else{
+    
     Ani.to(this, .5, "radius", BASE_RADIUS);
     Ani.to(this, .5, "bloomSize", radius / 20);
   }

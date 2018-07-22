@@ -7,6 +7,7 @@ public class Particle {
   private int col;
   private PVector direction;
   private PVector velocity;
+  private float distanceFromSpawn;
   
   private PVector acceleration;
   private PShape shape;
@@ -33,6 +34,7 @@ public class Particle {
     this.direction = direction;
     this.velocity = velocity;
     this.acceleration = new PVector(0, 0, 0);
+    this.distanceFromSpawn = 0.0f;
     this.createParticleShape();
   }
   
@@ -49,6 +51,7 @@ public class Particle {
   
   public void move(PVector velocity){
     //PVector transVector = this.direction.mult(this.velocity);
+    distanceFromSpawn += PVector.dist(new PVector(0, 0, 0), new PVector(velocity.x, velocity.y, velocity.z));
     this.shape.translate(velocity.x, velocity.y, velocity.z);
   }
   
@@ -70,5 +73,6 @@ public class Particle {
   public void setColor(int col) { this.col = col; }
   public PVector getDirection() { return this.direction; }
   public void setDirection(PVector direction) { this.direction = direction; }
+  public float getDistanceFromSpawn() { return this.distanceFromSpawn; }
   public void setVelocity(PVector velocity){ this.velocity = velocity; }
 }
