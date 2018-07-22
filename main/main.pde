@@ -114,15 +114,17 @@ void draw() {
   // Center Sphere when not using PeasyCam
   // sphere.translate(width/2,height/2,-100);
   shape(sphere);
+  
+  // Create new Particle
+  int pColor = colorFactory.randomBrightColor(150);
+  int pRadius = BASE_RADIUS / 10;
+  Particle p = new Particle(pRadius, pColor);
+  p.move(p.getDirection().mult(BASE_RADIUS - pRadius));
+  particles.add(p);
+  
+  
   if (beatSENS.isOnset()) {
-    // Create new Particle
-    int pColor = colorFactory.randomBrightColor(150);
-    int pRadius = BASE_RADIUS / 10;
-    Particle p = new Particle(pRadius, pColor);
-    p.move(p.getDirection().mult(BASE_RADIUS - pRadius));
-    particles.add(p);
     forceStr += 0.25f;
-   
   } else {
     forceStr -= 0.05f;
     if (forceStr < 0.0f) forceStr = 0.0f;
@@ -133,34 +135,34 @@ void draw() {
     Ani.to(this, .5, "radius", BASE_RADIUS * 1.10);
     Ani.to(this, .5, "bloomSize", radius / 2);
     
-    
-    // Animate all particles
-    for (int i = 0; i < particles.size(); ++i){
-      
-      Particle particle = particles.get(i);
-      
-      //particle.setColor(colorFactory.darken(particle.getColor(), 20));
-      PVector pDirection = particle.getDirection();
-      float pDistance = particle.getDistanceFromSpawn();
-      
-      PVector force = pDirection.mult(forceStr);
-      
-      // Increase force for objects that are far away
-      force = force.mult((pDistance / 300.0f) * 2.0f);
-     
-      particle.applyForce(force);
-
-    }  
-  }else{
-    
+  } else {
     Ani.to(this, .5, "radius", BASE_RADIUS);
     Ani.to(this, .5, "bloomSize", radius / 20);
   }
   
+  // Animate all particles
   for (int i = 0; i < particles.size(); ++i){
     Particle particle = particles.get(i);
+    
+    
+    if (beatSENS.isOnset()) {
+      particle.setColor(colorFactory.darken(particle.getColor(), 5));
+    }
+    else {}
+    
+    if (beatAMP.isOnset()) {
+ 
+      // Init Force with direction and current force strengh
+      PVector pDirection = particle.getDirection();
+      PVector force = pDirection.mult(forceStr);
+      // Increase force for objects that are far away
+      float pDistance = particle.getDistanceFromSpawn();
+      force = force.mult((pDistance / 300.0f) * 2.0f);
+      particle.applyForce(force);
+    }
+    
     particle.update();
-  }
+  }  
   
   // Apply Bloom Effect
   fx.render().bloom(.5, bloomSize, 30).compose();
