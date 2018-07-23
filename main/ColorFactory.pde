@@ -1,5 +1,3 @@
-/** Returns a completly random color */
-
 public class ColorFactory{
 
   public ColorFactory() {};
