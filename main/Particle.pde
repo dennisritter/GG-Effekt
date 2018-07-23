@@ -11,6 +11,7 @@ public class Particle {
   
   private PVector acceleration;
   private PShape shape;
+  private PVector pos;
   
   public Particle() {
     this(BASE_RADIUS);
@@ -35,6 +36,7 @@ public class Particle {
     this.velocity = velocity;
     this.acceleration = new PVector(0, 0, 0);
     this.distanceFromSpawn = 0.0f;
+    this.pos = new PVector (0, 0, 0);
     this.createParticleShape();
   }
   
@@ -52,6 +54,7 @@ public class Particle {
   public void move(PVector velocity){
     //PVector transVector = this.direction.mult(this.velocity);
     distanceFromSpawn += PVector.dist(new PVector(0, 0, 0), new PVector(velocity.x, velocity.y, velocity.z));
+    this.pos.add(velocity);
     this.shape.translate(velocity.x, velocity.y, velocity.z);
   }
   
@@ -60,10 +63,22 @@ public class Particle {
     this.acceleration.add(f);
   }
   
+  public void createTrail(PVector from, PVector to, int col) {
+    beginShape(LINES);
+    vertex(from.x, from.y, from.z);
+    vertex(to.x, to.y, to.z);
+    strokeWeight(1);
+    stroke(col);
+    endShape();
+  }
+  
   public void update(){
     shape.setFill(this.col);
     this.velocity.add(this.acceleration);
     this.move(this.velocity);
+    if(this.velocity.mag() > 75.0) {
+      this.createTrail(this.pos.copy().sub(this.velocity.copy().mult(10.0f)), this.pos, this.col);
+    }
     this.drawParticle();
     this.acceleration.mult(0);
     this.velocity.mult(0.98f);
@@ -74,6 +89,8 @@ public class Particle {
   public PVector getDirection() { return this.direction; }
   public void setDirection(PVector direction) { this.direction = direction; }
   public float getDistanceFromSpawn() { return this.distanceFromSpawn; }
+  public PVector getPos() { return this.pos; }
+  public void setPos(PVector pos) { this.pos = pos; }
   public int getRadius() { return this.radius; }
   public void setRadius(int r) { this.radius = r; }
   public void setVelocity(PVector velocity){ this.velocity = velocity; }

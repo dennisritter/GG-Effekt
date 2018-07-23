@@ -165,21 +165,18 @@ void draw() {
  
       // Init Force with direction and current force strengh
       PVector pDirection = particle.getDirection();
-      PVector force = pDirection.mult(forceStr);
-      // Increase force for objects that are far away
-      float pDistance = particle.getDistanceFromSpawn();
-
+      PVector force = pDirection.copy().mult(forceStr);
+      
       particle.applyForce(force);
     }
-    
+ 
     particle.update();
   }
   
   // Apply Bloom Effect
   fx.render().bloom(.5, bloomSize, 30).compose();
   //println(frameRate);
-  particles.trimToSize();
-  println(particles.size());
+  //println(particles.size());
 }
 
 void keyPressed() {
