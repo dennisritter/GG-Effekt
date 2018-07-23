@@ -17,6 +17,7 @@ AudioPlayer song;
 AudioInput input;
 BeatDetect beatAMP;
 BeatDetect beatSENS;
+//BeatDetect beatFRQ;
 
 PostFX fx;
 
@@ -28,19 +29,22 @@ ColorFactory colorFactory = new ColorFactory();
 
 PVector camRotationAngle = new PVector(0.5, 1.0, 2.0);
 int radius = BASE_RADIUS;
+int frameCounter = 0;
+int secCounter = 0;
+int startWaitSecs = 15;
 
 // The main Sphere in Center
 PShape sphere;
 
 float forceStr = 0.0f;
-int bloomSize = radius / 20;
+int bloomSize = radius / 10;
 ArrayList<Particle> particles = new ArrayList<Particle>();
 
 void setup() {
   
-    fullScreen(P3D);
+    //fullScreen(P3D);
     //size(1920, 1080, P3D);
-    //size(1024, 720, P3D);
+    size(1024, 720, P3D);
     
     // init PostFX
     fx = new PostFX(this);
@@ -60,6 +64,8 @@ void setup() {
     beatSENS = new BeatDetect();
     beatSENS.setSensitivity(10);
     beatSENS.detectMode(BeatDetect.SOUND_ENERGY);
+    //beatFRQ = new BeatDetect();
+    //beatFRQ.detectMode(BeatDetect.FREQ_ENERGY);
     input = minim.getLineIn();
 
     song.play();
@@ -67,25 +73,38 @@ void setup() {
 
 void draw() {
   background(0);
+  frameCounter += 1;
+
+  //beatFRQ.detect(song.mix);
   beatAMP.detect(song.mix);
   beatSENS.detect(song.mix);
   
-  noStroke();
   fill(255,255,255);
+  noStroke();
+  
   sphere = createShape(SPHERE, radius);
   shape(sphere);
   
+  println(song.position());
+  if( song.position() < 16500) {
+    if (frameCounter % 20 == 0) createParticle();
+  }else if(song.position() > 125000 && song.position() < 155000){
+    if (frameCounter % 20 == 0) createParticle();
+  }else if(song.position() > 217500 && song.position() < 240000){
+    if (frameCounter % 2 == 0) createParticle();
+  }else{
+    createParticle();
+  }
+  
 
-  int pColor = colorFactory.randomBrightColor(100);
-  int pRadius = (int) random(BASE_RADIUS / 40.0f, BASE_RADIUS / 5.0f);
-  int spawnBias =  5;
-  Particle p = new Particle(pRadius, pColor);
-  p.move(p.getDirection().mult(BASE_RADIUS - pRadius - spawnBias));
-  particles.add(p);
-
+  
+  forceStr = 0;
   if (beatSENS.isOnset()) {
-    if (forceStr <= 0.0f) forceStr += 1.0f;
-    else forceStr += 0.25f;
+    if(song.position() < 16500)forceStr += 0.25f;
+    else if(song.position() > 125000 && song.position() < 155500) forceStr += 0.25f;
+    else if(song.position() > 217500 && song.position() < 240000) forceStr += 0.4f;
+    else forceStr += 2.5f; 
+    
     if(forceStr > 2.5f) forceStr = 2.5f;
   }
   
@@ -127,6 +146,15 @@ void draw() {
   fx.render().bloom(.5, bloomSize, 30).compose();
   //println(frameRate);
   //println(particles.size());
+}
+
+public void createParticle(){
+  int pColor = colorFactory.randomBrightColor(100);
+  int pRadius = (int) random(BASE_RADIUS / 40.0f, BASE_RADIUS / 5.0f);
+  int spawnBias =  5;
+  Particle p = new Particle(pRadius, pColor);
+  p.move(p.getDirection().mult(BASE_RADIUS - pRadius - spawnBias));
+  particles.add(p);
 }
 
 void keyPressed() {
