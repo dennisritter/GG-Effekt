@@ -38,8 +38,9 @@ ArrayList<Particle> particles = new ArrayList<Particle>();
 
 void setup() {
   
-    //fullScreen(P3D);
-    size(1024, 720, P3D);
+    fullScreen(P3D);
+    //size(1920, 1080, P3D);
+    //size(1024, 720, P3D);
     
     // init PostFX
     fx = new PostFX(this);
@@ -99,7 +100,10 @@ void draw() {
   }
   
   // Animate all particles
-  for(Particle particle : new ArrayList<Particle>(particles)){  
+  for(Particle particle : new ArrayList<Particle>(particles)){
+    if (particle.distanceFromSpawn >= 4000) {
+      particle.setColor(colorFactory.darken(particle.getColor(), 10));
+    }
     if (particle.distanceFromSpawn >= 5000) {
       particles.remove(particle);
     }
@@ -121,7 +125,7 @@ void draw() {
   
   // Apply Bloom Effect
   fx.render().bloom(.5, bloomSize, 30).compose();
-  println(frameRate);
+  //println(frameRate);
   //println(particles.size());
 }
 
