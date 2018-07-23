@@ -38,8 +38,8 @@ ArrayList<Particle> particles = new ArrayList<Particle>();
 
 void setup() {
   
-    fullScreen(P3D);
-    //size(1024, 720, P3D);
+    //fullScreen(P3D);
+    size(1024, 720, P3D);
     
     // init PostFX
     fx = new PostFX(this);
@@ -77,8 +77,9 @@ void draw() {
 
   int pColor = colorFactory.randomBrightColor(100);
   int pRadius = (int) random(BASE_RADIUS / 40.0f, BASE_RADIUS / 5.0f);
+  int spawnBias =  5;
   Particle p = new Particle(pRadius, pColor);
-  p.move(p.getDirection().mult(BASE_RADIUS - pRadius));
+  p.move(p.getDirection().mult(BASE_RADIUS - pRadius - spawnBias));
   particles.add(p);
 
   if (beatSENS.isOnset()) {
